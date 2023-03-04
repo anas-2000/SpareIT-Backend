@@ -1,4 +1,5 @@
 const router = require("express").Router()
+const passport = require('passport')
 const User = require("../models/User")
 const CryptoJS = require("crypto-js")
 const jwt = require("jsonwebtoken")
@@ -11,7 +12,8 @@ router.post("/register", async (req, res) => {
         username: req.body.username,
         email: req.body.email,
         password: CryptoJS.AES.encrypt(req.body.password, process.env.PASS_KEY).toString(),
-        phoneNumber: req.body.phoneNumber
+        phoneNumber: req.body.phoneNumber,
+        isAdmin: req.body.isAdmin
     })
     try{
         await newUser.save()
@@ -57,6 +59,28 @@ router.post("/login", async (req, res) => {
     }catch(err){
         res.send("something is wrong")
     }
+})
+
+
+// when oauth isnt successful
+router.get('/oauth-failure', (req, res) => {
+    res.send('oauth-failure')
+})
+
+// oauth
+router.get('/google',
+  passport.authenticate('google', { scope: ['profile'] }));
+
+router.get('/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/api/auth/oauth-failure' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/');
+  });
+
+router.get('/logout', (req, res) => {
+    req.logOut()
+    res.redirect('/')
 })
 
 module.exports = router
