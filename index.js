@@ -1,9 +1,10 @@
 const express = require("express")
 const passport = require('passport')
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo');
 const cors = require("cors")
 const dotenv = require("dotenv")
+
 const userRoute = require("./routes/user")
 const authRoute = require("./routes/auth")
 const productRoute = require("./routes/product")
@@ -35,8 +36,8 @@ app.use(session({
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: false,
-    cookie: {secure: true}, // this won't work without https
-    store: new MongoStore({mongooseConnection: mongoose.connection})
+    cookie: {secure: false}, // this won't work without https
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL })
   }));
 app.use(passport.initialize())
 app.use(passport.session())
