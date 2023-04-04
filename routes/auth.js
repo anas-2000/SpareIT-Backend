@@ -92,6 +92,7 @@ router.get('/logout', (req, res) => {
 router.post("/register/buyer", async (req, res) => {
     const user = await User.findOne({username: req.body.username})
     const newBuyer = new Buyer({
+        _id: user._id,
         username: user.username,
         shippingAddress: req.body.shippingAddress,
         billingAddress: req.body.billingAddress,
@@ -126,8 +127,8 @@ router.post("/register/buyer", async (req, res) => {
 router.post("/register/seller", async (req, res) => {
     const user = await User.findOne({username: req.body.username})
     const newSeller = new Seller({
+        _id: user._id,
         username: user.username,
-        vendorID: req.body.vendorID,
         shopAddress: req.body.shopAddress,
         email: user.email,
         password: CryptoJS.AES.encrypt(user.password, process.env.PASS_KEY).toString(),
