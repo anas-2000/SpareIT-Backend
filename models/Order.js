@@ -4,6 +4,7 @@ const OrderSchema = new mongoose.Schema({
     userId: {type: String, required: true},
     products: [
         {
+            vendorId: { type: String, required: true},
             productId: { type: String, required: true},
             quantity: { type: Number, default: 1 }
         }

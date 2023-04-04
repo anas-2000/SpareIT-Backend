@@ -1,6 +1,10 @@
 const router = require("express").Router()
 const passport = require('passport')
+
 const User = require("../models/User")
+const Buyer = require("../models/Buyer")
+const Seller = require("../models/Seller")
+
 const CryptoJS = require("crypto-js")
 const jwt = require("jsonwebtoken")
 const dotenv = require("dotenv")
@@ -81,6 +85,75 @@ router.get('/google/callback',
 router.get('/logout', (req, res) => {
     req.logOut()
     res.redirect('/')
+})
+
+
+// user registering as buyer
+router.post("/register/buyer", async (req, res) => {
+    const user = await User.findOne({username: req.body.username})
+    const newBuyer = new Buyer({
+        username: user.username,
+        shippingAddress: req.body.shippingAddress,
+        billingAddress: req.body.billingAddress,
+        email: user.email,
+        password: CryptoJS.AES.encrypt(user.password, process.env.PASS_KEY).toString(),
+        phoneNumber: user.phoneNumber,
+        isAdmin: user.isAdmin
+    })
+    try{
+        await newBuyer.save()
+        res.send("Registration successful")
+    }
+    catch(err){
+        // res.send(err)
+        if (!newBuyer.password){
+            res.send("Please enter a password")
+        }
+        else if (!newBuyer.username){
+            res.send("Please enter a username")
+        }
+        else if (!newBuyer.email){
+            res.send("Please enter an email")
+        }
+        else {
+            console.log(err)
+        }
+    }
+    
+})
+
+// user registering as seller
+router.post("/register/seller", async (req, res) => {
+    const user = await User.findOne({username: req.body.username})
+    const newSeller = new Seller({
+        username: user.username,
+        vendorID: req.body.vendorID,
+        shopAddress: req.body.shopAddress,
+        email: user.email,
+        password: CryptoJS.AES.encrypt(user.password, process.env.PASS_KEY).toString(),
+        phoneNumber: user.phoneNumber,
+        isAdmin: user.isAdmin
+    })
+    try{
+        await newSeller.save()
+        res.send("Registration successful")
+    }
+    catch(err){
+        // res.send(err)
+        if (!newSeller.password){
+            res.send("Please enter a password")
+        }
+        else if (!newSeller.username){
+            res.send("Please enter a username")
+        }
+        else if (!newSeller.email){
+            res.send("Please enter an email")
+        }
+        else {
+            console.log(err)
+        }
+    }
+    
 })
 
 module.exports = router
