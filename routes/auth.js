@@ -15,50 +15,109 @@ router.post("/register", async (req, res) => {
         phoneNumber: req.body.phoneNumber,
         isAdmin: req.body.isAdmin
     })
-    try{
+    try {
         await newUser.save()
         res.send("Registration successful")
     }
-    catch(err){
+    catch (err) {
         // res.send(err)
-        if (!newUser.password){
+        if (!newUser.password) {
             res.send("Please enter a password")
         }
-        else if (!newUser.username){
+        else if (!newUser.username) {
             res.send("Please enter a username")
         }
-        else if (!newUser.email){
+        else if (!newUser.email) {
             res.send("Please enter an email")
         }
         else {
             console.log(err)
         }
     }
-    
+
 })
 
-router.post("/login", async (req, res) => {
-    try{
-        const user = await User.findOne({username: req.body.username})
-        const encryptedPassword = user.password
-        const originalPassword = CryptoJS.AES.decrypt(encryptedPassword, process.env.PASS_KEY).toString(CryptoJS.enc.Utf8)
-        !user || req.body.password !== originalPassword && res.status(401).json("Please enter valid username and password")
+router.post("/login", (req, res) => {
+    User.findOne({ username: req.body.username }).then((user) => {
+        // const password = user.password
+        if (!user) {
+            res.statusCode = 401;
+            res.setHeader('Content-Type', 'application/json');
+            res.json({sucess: false, status: 'Login Unsuccessful!', err: 'invalid username'});
+        }
+        else {
+            const userpassword = user.password
+            if(req.body.password !== userpassword){
+                res.statusCode = 401;
+            res.setHeader('Content-Type', 'application/json');
+            res.json({sucess: false, status: 'Login Unsuccessful!', err: 'invalid pasword'});
+            }
+            else{
+                const accessToken = jwt.sign({
+                    id: user._id,
+                    isAdmin: user.isAdmin
+                },
+                    process.env.JWT_KEY,
+                    { expiresIn: "1d" }
+                )
+    
+                const { password, ...otherFields } = user._doc
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({ ...otherFields, accessToken });
+            }
+            
+        }
+    }).catch((err)=>{
+        console.log(err);
+    })
 
-        const accessToken = jwt.sign({
-            id: user._id,
-            isAdmin: user.isAdmin
-        }, 
-        process.env.JWT_KEY,
-        { expiresIn: "1d" }
-        )
 
-        const { password, ...otherFields } = user._doc
-        res.status(200).json({...otherFields, accessToken})
-        
-        
-    }catch(err){
-        res.send("something is wrong")
-    }
+
+    // try {
+    //     User.findOne({ username: req.body.username }).then((user) => {
+    //         console.log(user)
+    //         // const user = User.findOne({ username: req.body.username })
+    //         const encryptedPassword = user.password
+    //         // uncomment when using encryption for passwords
+    //         // const originalPassword = CryptoJS.AES.decrypt(encryptedPassword, process.env.PASS_KEY).toString(CryptoJS.enc.Utf8)
+    //         const originalPassword = encryptedPassword
+    //         !user || req.body.password !== originalPassword && res.status(401).json("Please enter valid username and password")
+    //         const accessToken = jwt.sign({
+    //             id: user._id,
+    //             isAdmin: user.isAdmin
+    //         },
+    //             process.env.JWT_KEY,
+    //             { expiresIn: "1d" }
+    //         )
+
+    //         const { password, ...otherFields } = user._doc
+    //         res.status(200).json({ ...otherFields, accessToken })
+    //     })
+
+
+
+
+    //     // const user = User.findOne({ username: req.body.username })
+    //     // const encryptedPassword = user.password
+    //     // const originalPassword = CryptoJS.AES.decrypt(encryptedPassword, process.env.PASS_KEY).toString(CryptoJS.enc.Utf8)
+    //     // !user || req.body.password !== originalPassword && res.status(401).json("Please enter valid username and password")
+
+    //     // const accessToken = jwt.sign({
+    //     //     id: user._id,
+    //     //     isAdmin: user.isAdmin
+    //     // },
+    //     //     process.env.JWT_KEY,
+    //     //     { expiresIn: "1d" }
+    //     // )
+
+    //     // const { password, ...otherFields } = user._doc
+    //     // res.status(200).json({ ...otherFields, accessToken })
+
+
+    // } catch (err) {
+    //     res.send("something is wrong")
+    // }
 })
 
 
@@ -69,14 +128,14 @@ router.get('/oauth-failure', (req, res) => {
 
 // oauth
 router.get('/google',
-  passport.authenticate('google', { scope: ['profile'] }));
+    passport.authenticate('google', { scope: ['profile'] }));
 
-router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/api/auth/oauth-failure' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/');
-  });
+router.get('/google/callback',
+    passport.authenticate('google', { failureRedirect: '/api/auth/oauth-failure' }),
+    function (req, res) {
+        // Successful authentication, redirect home.
+        res.redirect('/');
+    });
 
 router.get('/logout', (req, res) => {
     req.logOut()
