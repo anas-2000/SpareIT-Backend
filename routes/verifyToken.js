@@ -20,21 +20,40 @@ const verifyToken = (req, res, next) => {
 
 const verifyTokenAndAuthorization = (req, res, next) => {
     verifyToken(req, res, () => {
-        if (req.user.id === req.params.id || req.user.isAdmin){
-            next()
-        }else{
-            res.status(403).json("You are not allowed to make any changes.")
+        if(req.user){
+            if (req.user.id === req.params.id || req.user.isAdmin){
+                next()
+            }else{
+                res.status(403).json("You are not allowed to make any changes.")
+            }
         }
+        else{
+            res.status(401).json("Your are not authenticated");
+        }
+        
     })
 }
 
 const verifyTokenAndAdmin = (req, res, next) => {
     verifyToken(req, res, () => {
-        if (req.user.isAdmin){
-            next()
-        }else{
-            res.status(403).json("Access not allowed.")
+
+        if(req.user){
+            if(req.user.isAdmin){
+                next();
+            }
+            else{
+                res.status(403).json("Access not allowed");
+            }
+            
         }
+        else{
+            res.status(401).json("Your are not authenticated");
+        }
+        // if (req.user.isAdmin){
+        //     next()
+        // }else{
+        //     res.status(403).json("Access not allowed.")
+        // }
     })
 }
 

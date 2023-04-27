@@ -4,14 +4,23 @@ const Order = require("../models/Order")
 
 // Create
 router.post("/", verifyToken, async (req, res) => {
-    const newOrder = new Order(req.body);
+    Order.create(req.body).then((order) => {
+        Order.findById(order._id).then((order) => {
+            res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(order);
+        })
+    }, (err) => res.status(500).json(err)).catch((err) => res.status(500).json(err));
 
-    try{
-        const savedOrder = await newOrder.save();
-        res.status(200).json(savedOrder)
-    }catch(err){
-        res.status(500).json(err)
-    }
+
+    // const newOrder = new Order(req.body);
+
+    // try{
+    //     const savedOrder = await newOrder.save();
+    //     res.status(200).json(savedOrder)
+    // }catch(err){
+    //     res.status(500).json(err)
+    // }
 })
 
 

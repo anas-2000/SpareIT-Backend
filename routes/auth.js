@@ -10,14 +10,28 @@ dotenv.config()
 router.post("/register", async (req, res) => {
     const newUser = new User({
         username: req.body.username,
-        email: req.body.email,
+        // email: req.body.email,
         password: CryptoJS.AES.encrypt(req.body.password, process.env.PASS_KEY).toString(),
-        phoneNumber: req.body.phoneNumber,
+        // phoneNumber: req.body.phoneNumber,
         isAdmin: req.body.isAdmin
     })
     try {
-        await newUser.save()
-        res.send("Registration successful")
+        newUser.save((err, user) => {
+            if (err) {
+                res.statusCode = 500;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({ err: err });
+                return;
+            }
+            else{
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json('Registration Successful');
+            }
+        })
+
+        // await newUser.save()
+        // res.send("Registration successful")
     }
     catch (err) {
         // res.send(err)
@@ -43,16 +57,18 @@ router.post("/login", (req, res) => {
         if (!user) {
             res.statusCode = 401;
             res.setHeader('Content-Type', 'application/json');
-            res.json({sucess: false, status: 'Login Unsuccessful!', err: 'invalid username'});
+            res.json({ sucess: false, status: 'Login Unsuccessful!', err: 'invalid username' });
         }
         else {
-            const userpassword = user.password
-            if(req.body.password !== userpassword){
+            const encryptedPassword = user.password
+            const userpassword = CryptoJS.AES.decrypt(encryptedPassword, process.env.PASS_KEY).toString(CryptoJS.enc.Utf8)
+            // const userpassword = user.password
+            if (req.body.password !== userpassword) {
                 res.statusCode = 401;
-            res.setHeader('Content-Type', 'application/json');
-            res.json({sucess: false, status: 'Login Unsuccessful!', err: 'invalid pasword'});
+                res.setHeader('Content-Type', 'application/json');
+                res.json({ sucess: false, status: 'Login Unsuccessful!', err: 'invalid pasword' });
             }
-            else{
+            else {
                 const accessToken = jwt.sign({
                     id: user._id,
                     isAdmin: user.isAdmin
@@ -60,15 +76,15 @@ router.post("/login", (req, res) => {
                     process.env.JWT_KEY,
                     { expiresIn: "1d" }
                 )
-    
+
                 const { password, ...otherFields } = user._doc
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
                 res.json({ ...otherFields, accessToken });
             }
-            
+
         }
-    }).catch((err)=>{
+    }).catch((err) => {
         console.log(err);
     })
 

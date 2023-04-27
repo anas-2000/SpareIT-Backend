@@ -11,7 +11,7 @@ router.post("/", verifyTokenAndAdmin, async (req, res) => {
 
     try{
         const savedProduct = await newProduct.save();
-        res.status(200).json("Product saved.")
+        res.status(200).json(savedProduct);
     }catch(err){
         res.status(500).json(err)
     }
@@ -36,7 +36,7 @@ router.put("/:id", verifyTokenAndAdmin, async (req,res) => {
 router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
     try{
         await Product.findByIdAndDelete(req.params.id)
-        res.status(200).json("Product deleted.")
+        res.status(200).json(req.params.id)
     }catch(err){
         res.status(500).json(err)
     }
@@ -65,7 +65,8 @@ router.get("/", async (req, res) => {
         if(queryNew){
             products = await Product.find().sort({ createdAt: -1 }).limit(5);
         } else if(queryCategory){
-            products = await Product.find({ categories: { $in: [queryCategory] } })
+            // products = await Product.find({ categories: { $in: [queryCategory] } }) // use this line if categories array is used in db
+            products = await Product.find({ category: { $in: [queryCategory] } }) // use this line if category field is used in db
         } else{
             products = await Product.find()
         }
