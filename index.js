@@ -1,3 +1,5 @@
+var createError = require('http-errors');
+var path = require('path');
 const express = require("express")
 const passport = require('passport')
 const session = require('express-session');
@@ -11,6 +13,7 @@ const productRoute = require("./routes/product")
 const cartRoute = require("./routes/cart")
 const orderRoute = require("./routes/order")
 const stripeRoute = require("./routes/stripe")
+const commentRoute = require("./routes/comments");
 const db = require("./db")
 
 
@@ -30,6 +33,7 @@ app.use("/api/products", productRoute)
 app.use("/api/carts", cartRoute)
 app.use("/api/orders", orderRoute)
 app.use("/api/stripe", stripeRoute)
+app.use("/api/comments", commentRoute)
 
 
 app.use(session({
@@ -46,3 +50,16 @@ app.use(passport.session())
 app.listen(process.env.PORT, () => {
     console.log(`listening on port ${process.env.PORT}...`)
 })
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
