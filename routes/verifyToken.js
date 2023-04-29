@@ -18,6 +18,17 @@ const verifyToken = (req, res, next) => {
     }
 }
 
+const verifyUser = (req, res, next) => {
+    verifyToken(req, res, () => {
+        if(req.user){
+            next()
+        }
+        else{
+            res.status(401).json("You are not authenticated")
+        }
+    })
+}
+
 const verifyTokenAndAuthorization = (req, res, next) => {
     verifyToken(req, res, () => {
         if(req.user){
@@ -28,7 +39,7 @@ const verifyTokenAndAuthorization = (req, res, next) => {
             }
         }
         else{
-            res.status(401).json("Your are not authenticated");
+            res.status(401).json("You are not authenticated");
         }
         
     })
@@ -57,4 +68,4 @@ const verifyTokenAndAdmin = (req, res, next) => {
     })
 }
 
-module.exports = {verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin}
+module.exports = {verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin, verifyUser}

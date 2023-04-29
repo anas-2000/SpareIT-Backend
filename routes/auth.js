@@ -64,7 +64,7 @@ router.post("/login", (req, res) => {
             const userpassword = CryptoJS.AES.decrypt(encryptedPassword, process.env.PASS_KEY).toString(CryptoJS.enc.Utf8)
             // const userpassword = user.password
             if (req.body.password !== userpassword) {
-                console.log(req.body.password);
+                // console.log(req.body.password);
                 res.statusCode = 401;
                 res.setHeader('Content-Type', 'application/json');
                 res.json({ sucess: false, status: 'Login Unsuccessful!', err: 'invalid pasword' });
