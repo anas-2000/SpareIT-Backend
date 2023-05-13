@@ -1,20 +1,27 @@
 // this is for vendor/warehouse side of the application, have to change verifyToken functions accordingly 
 // because they're built for client/admin side (excepe 1 or 2)
-
+const bodyParser = require('body-parser');
 const router = require("express").Router()
 const {verifyToken, verifyTokenAndAdmin} = require("./verifyToken")
 const Product = require("../models/Product")
 
 // Create
-router.post("/", verifyTokenAndAdmin, async (req, res) => {
-    const newProduct = new Product(req.body);
+router.post("/", verifyTokenAndAdmin, async (req, res, next) => {
 
-    try{
-        const savedProduct = await newProduct.save();
-        res.status(200).json(savedProduct);
-    }catch(err){
-        res.status(500).json(err)
-    }
+    Product.create(req.body).then((product) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(product);
+    }, (err) => next(err))
+    .catch((err) => next(err));
+    // const newProduct = new Product(req.body);
+
+    // try{
+    //     const savedProduct = await newProduct.save();
+    //     res.status(200).json(savedProduct);
+    // }catch(err){
+    //     res.status(500).json(err)
+    // }
 })
 
 
@@ -58,6 +65,7 @@ router.get("/find/:id", async (req, res) => {
 router.get("/", async (req, res) => {
     const queryNew = req.query.new;
     const queryCategory = req.query.category;
+    const querySeller = req.query.seller; //
 
     try{
         let products;
@@ -67,7 +75,11 @@ router.get("/", async (req, res) => {
         } else if(queryCategory){
             // products = await Product.find({ categories: { $in: [queryCategory] } }) // use this line if categories array is used in db
             products = await Product.find({ category: { $in: [queryCategory] } }) // use this line if category field is used in db
-        } else{
+        }
+        else if(querySeller){//
+            products = await Product.find({ seller: querySeller }); // use this line if seller field is used in db
+        } 
+        else{
             products = await Product.find()
         }
 
@@ -76,6 +88,7 @@ router.get("/", async (req, res) => {
 
     }
 })
+
 
 
 module.exports = router

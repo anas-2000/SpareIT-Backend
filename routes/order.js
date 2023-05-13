@@ -1,9 +1,9 @@
 const router = require("express").Router()
-const {verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin} = require("./verifyToken")
+const {verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin, verifyUser} = require("./verifyToken")
 const Order = require("../models/Order")
 
 // Create
-router.post("/", verifyToken, async (req, res) => {
+router.post("/", verifyUser, async (req, res) => { //verifyToken
     Order.create(req.body).then((order) => {
         Order.findById(order._id).then((order) => {
             res.statusCode = 200;
