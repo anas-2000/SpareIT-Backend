@@ -28,20 +28,24 @@ const ProductSchema = new mongoose.Schema({
     // },
     manufacturer: {
         type: String,
-        required: true
+        default: ''
+        // required: true
     },
     vehicle: {
-        type: Array
+        type: Array,
+        default: []
     },
     vehiclemodel: {
-        type: Array
+        type: Array,
+        default: []
     },
     price: {
         type: Number,
         required: true
     },
     rating: {
-        type: Number
+        type: Number,
+        default: 0 //
     },
     // featured: {
     //     type: Boolean,

@@ -14,6 +14,7 @@ const cartRoute = require("./routes/cart")
 const orderRoute = require("./routes/order")
 const stripeRoute = require("./routes/stripe")
 const commentRoute = require("./routes/comments");
+const revenueRoute = require("./routes/revenue")
 const db = require("./db")
 
 
@@ -34,6 +35,7 @@ app.use("/api/carts", cartRoute)
 app.use("/api/orders", orderRoute)
 app.use("/api/stripe", stripeRoute)
 app.use("/api/comments", commentRoute)
+app.use("/api/revenue", revenueRoute)
 
 
 app.use(session({
