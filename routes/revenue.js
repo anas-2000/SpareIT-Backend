@@ -34,15 +34,6 @@ router.route("/")
     }
 
 
-
-    // Revenue.find(req.body)
-    // .populate('seller')
-    // .then((revenues) => {
-    //     res.statusCode = 200;
-    //     res.setHeader('Content-Type', 'application/json');
-    //     res.json(revenues);
-    // }, (err) => next(err))
-    // .catch((err) => next(err));
 })
 .post(verifyUser, (req, res, next) => {
     if(req.body != null){
@@ -60,14 +51,6 @@ router.route("/")
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.json(rev);
-            // Revenue.findById(revenue._id)
-            // .populate('seller')
-            // .populate('order')
-            // .then((revenue) => {
-            //     res.statusCode = 200;
-            //     res.setHeader('Content-Type', 'application/json');
-            //     res.json(revenue);
-            // })
         }, (err) => next(err))
         .catch((err) => next(err));
     }

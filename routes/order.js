@@ -11,16 +11,6 @@ router.post("/", verifyUser, async (req, res) => { //verifyToken
                 res.json(order);
         })
     }, (err) => res.status(500).json(err)).catch((err) => res.status(500).json(err));
-
-
-    // const newOrder = new Order(req.body);
-
-    // try{
-    //     const savedOrder = await newOrder.save();
-    //     res.status(200).json(savedOrder)
-    // }catch(err){
-    //     res.status(500).json(err)
-    // }
 })
 
 

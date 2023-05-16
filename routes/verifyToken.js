@@ -13,8 +13,6 @@ const verifyToken = (req, res, next) => {
                 req.user = user
                 next()
             }
-            // req.user = user
-            // next()
         })
     }
     else{
@@ -64,11 +62,6 @@ const verifyTokenAndAdmin = (req, res, next) => {
         else{
             res.status(401).json("Your are not authenticated");
         }
-        // if (req.user.isAdmin){
-        //     next()
-        // }else{
-        //     res.status(403).json("Access not allowed.")
-        // }
     })
 }
 

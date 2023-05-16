@@ -75,7 +75,7 @@ router.post("/login", (req, res) => {
                     isAdmin: user.isAdmin
                 },
                     process.env.JWT_KEY,
-                    { expiresIn: "1d" }
+                    { expiresIn: "10d" } //
                 )
 
                 const { password, ...otherFields } = user._doc
@@ -88,53 +88,6 @@ router.post("/login", (req, res) => {
     }).catch((err) => {
         console.log(err);
     })
-
-
-
-    // try {
-    //     User.findOne({ username: req.body.username }).then((user) => {
-    //         console.log(user)
-    //         // const user = User.findOne({ username: req.body.username })
-    //         const encryptedPassword = user.password
-    //         // uncomment when using encryption for passwords
-    //         // const originalPassword = CryptoJS.AES.decrypt(encryptedPassword, process.env.PASS_KEY).toString(CryptoJS.enc.Utf8)
-    //         const originalPassword = encryptedPassword
-    //         !user || req.body.password !== originalPassword && res.status(401).json("Please enter valid username and password")
-    //         const accessToken = jwt.sign({
-    //             id: user._id,
-    //             isAdmin: user.isAdmin
-    //         },
-    //             process.env.JWT_KEY,
-    //             { expiresIn: "1d" }
-    //         )
-
-    //         const { password, ...otherFields } = user._doc
-    //         res.status(200).json({ ...otherFields, accessToken })
-    //     })
-
-
-
-
-    //     // const user = User.findOne({ username: req.body.username })
-    //     // const encryptedPassword = user.password
-    //     // const originalPassword = CryptoJS.AES.decrypt(encryptedPassword, process.env.PASS_KEY).toString(CryptoJS.enc.Utf8)
-    //     // !user || req.body.password !== originalPassword && res.status(401).json("Please enter valid username and password")
-
-    //     // const accessToken = jwt.sign({
-    //     //     id: user._id,
-    //     //     isAdmin: user.isAdmin
-    //     // },
-    //     //     process.env.JWT_KEY,
-    //     //     { expiresIn: "1d" }
-    //     // )
-
-    //     // const { password, ...otherFields } = user._doc
-    //     // res.status(200).json({ ...otherFields, accessToken })
-
-
-    // } catch (err) {
-    //     res.send("something is wrong")
-    // }
 })
 
 
